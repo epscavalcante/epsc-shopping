@@ -1,0 +1,39 @@
+{
+    "name": "epscavalcante/epsc-shopping",
+    "description": "PHP Project",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Eduardo Cavalcante",
+            "email": "eduardo.ps.cavalcante@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Src\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "pestphp/pest": "^3.8",
+        "symfony/var-dumper": "^7.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "serve": "php -S 0.0.0.0:8000 ./src/Drivers/Api.php",
+        "test": "./vendor/bin/pest",
+        "test:coverage": "./vendor/bin/pest --coverage"
+    }
+}
