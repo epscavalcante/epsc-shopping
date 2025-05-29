@@ -3,6 +3,7 @@
 use Src\Domain\Entities\Order;
 use Src\Domain\Entities\OrderCustomer;
 use Src\Domain\Entities\Product;
+use Src\Domain\Enums\OrderStatusEnum;
 
 describe('Order Tests', function () {
     test('Deve criar um pedido com itens vazio', function () {
@@ -17,6 +18,7 @@ describe('Order Tests', function () {
         );
         
         expect($order->getTotal())->toBe(0);
+        expect($order->getStatus())->toBe(OrderStatusEnum::CREATED->value);
     });
 
     test('Deve criar um pedido com 2 items', function () {
@@ -45,5 +47,6 @@ describe('Order Tests', function () {
         $order->addItem($product2, 2);
         
         expect($order->getTotal())->toBe(1100);
+        expect($order->getStatus())->toBe(OrderStatusEnum::CREATED->value);
     });
 });

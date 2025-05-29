@@ -3,6 +3,7 @@
 use Src\Domain\Entities\Order;
 use Src\Domain\Entities\OrderCustomer;
 use Src\Domain\Entities\Product;
+use Src\Domain\Enums\OrderStatusEnum;
 use Src\Infraestructure\Repositories\OrderDatabaseRepository;
 
 describe('Order Repository Database Tests', function () {
@@ -53,6 +54,6 @@ describe('Order Repository Database Tests', function () {
         expect($orderCreated->getCustomerEmail())->toBe($customer->email);
         expect($orderCreated->getCustomerPhone())->toBe($customer->phone);
         expect($orderCreated->getTotal())->toBe(7900);
-
+        expect($orderCreated->getStatus())->toBe(OrderStatusEnum::CREATED->value);
     });
 });

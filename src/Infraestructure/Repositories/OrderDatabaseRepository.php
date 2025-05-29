@@ -8,6 +8,7 @@ use Exception;
 use PDO;
 use Src\Domain\Entities\Order;
 use Src\Domain\Entities\OrderCustomer;
+use Src\Domain\Enums\OrderStatusEnum;
 use Src\Domain\Repositories\OrderRepository;
 
 class OrderDatabaseRepository implements OrderRepository
@@ -30,14 +31,13 @@ class OrderDatabaseRepository implements OrderRepository
 
     public function create(Order $order): void
     {
-        // criar a order
-        $orderInserQuery = "INSERT INTO app.pedidos (pedido_id, total) VALUES (:pedido_id, :total)";
+        $orderInserQuery = "INSERT INTO app.pedidos (pedido_id, total, status) VALUES (:pedido_id, :total, :status)";
         $orderInsertQueryStmt = $this->databaseConnection->prepare($orderInserQuery);
         $orderInsertQueryStmt->bindValue(':pedido_id', $order->getId());
         $orderInsertQueryStmt->bindValue(':total', $order->getTotal());
+        $orderInsertQueryStmt->bindValue(':status', $order->getStatus());
         $orderInsertQueryStmt->execute();
 
-        // salvar o customer
         $customerInsertQuery = "INSERT INTO app.clientes (pedido_id, nome, email, telefone) VALUES (:pedido_id, :nome, :email, :telefone)";
         $customerInsertQueryStmt = $this->databaseConnection->prepare($customerInsertQuery);
         $customerInsertQueryStmt->bindValue(':pedido_id', $order->getId());
@@ -46,7 +46,6 @@ class OrderDatabaseRepository implements OrderRepository
         $customerInsertQueryStmt->bindValue(':telefone', $order->getCustomerPhone());
         $customerInsertQueryStmt->execute();
 
-        // salvar os itens
         foreach ($order->getItems() as $orderItem) {
             $itemsInsertQuery = "INSERT INTO app.itens_do_pedido (pedido_id, produto_id, preco, quantidade, total) VALUES (:pedido_id, :produto_id, :preco, :quantidade, :total)";
             $itemsInsertQueryStmt = $this->databaseConnection->prepare($itemsInsertQuery);
@@ -76,6 +75,7 @@ class OrderDatabaseRepository implements OrderRepository
 
         $order = new Order(
             orderId: $getOrderQueryResult->pedido_id,
+            status: OrderStatusEnum::tryFrom($getOrderQueryResult->status),
             customer: new OrderCustomer(
                 name: $getOrderQueryResult->nome,
                 email: $getOrderQueryResult->email,

@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace Src\Domain\Entities;
 
+use Src\Domain\Enums\OrderStatusEnum;
+
 class Order
 {
+    private OrderStatusEnum $status;
+
     private OrderItems $items;
 
     public function __construct(
         private readonly string $orderId,
         private readonly OrderCustomer $customer,
+        ?OrderStatusEnum $status = OrderStatusEnum::CREATED,
     ) {
         $this->items = new OrderItems();
+        $this->status = $status;
     }
 
     public function getId(): string
@@ -23,6 +29,11 @@ class Order
     public function getTotal(): int
     {
         return $this->items->getTotal();
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status->value;
     }
 
     public function addItem(Product $product, int $quantity): void
