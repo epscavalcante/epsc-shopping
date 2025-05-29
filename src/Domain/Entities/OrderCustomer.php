@@ -7,8 +7,8 @@ namespace Src\Domain\Entities;
 class OrderCustomer
 {
     public function __construct(
-        public readonly ?string $accountId = null,
+        public readonly string $name,
         public readonly string $email,
-        public readonly string $phone
+        public readonly string $phone,
     ) {}
 }

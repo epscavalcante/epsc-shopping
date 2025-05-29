@@ -6,16 +6,13 @@ namespace Src\Domain\Entities;
 
 class Order
 {
-    /**
-     * @var OrderItem[]
-     */
-    private array $items;
+    private OrderItems $items;
 
     public function __construct(
         private readonly string $orderId,
         private readonly OrderCustomer $customer,
     ) {
-        $this->items = [];
+        $this->items = new OrderItems();
     }
 
     public function getId(): string
@@ -25,17 +22,7 @@ class Order
 
     public function getTotal(): int
     {
-        $total = 0;
-        
-        if (count($this->items) === 0) {
-            return $total;
-        }
-
-        foreach($this->items as $item) {
-            $total += $item->getTotal();
-        }
-
-        return $total;
+        return $this->items->getTotal();
     }
 
     public function addItem(Product $product, int $quantity): void
@@ -46,6 +33,40 @@ class Order
             quantity: $quantity
         );
 
-        array_push($this->items, $item);
+        $this->items->add($item);
+    }
+
+    public function restoreItem(string $productId, int $price, int $quantity): void
+    {
+        $item = new OrderItem(
+            productId: $productId,
+            price: $price,
+            quantity: $quantity
+        );
+
+        $this->items->add($item);
+    }
+
+    /**
+     * @return OrderItem[]
+     */
+    public function getItems(): array
+    {
+        return $this->items->getItems();
+    }
+
+    public function getCustomerName(): ?string
+    {
+        return $this->customer->name;
+    }
+
+    public function getCustomerEmail(): ?string
+    {
+        return $this->customer->email;
+    }
+
+    public function getCustomerPhone(): ?string
+    {
+        return $this->customer->phone;
     }
 }

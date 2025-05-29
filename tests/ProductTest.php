@@ -3,7 +3,6 @@
 use Src\Domain\Entities\Product;
 
 describe('Product Test', function () {
-
     test('Deve criar um produto', function () {
         $productId = uniqid('PROD_');
         $product = new Product(

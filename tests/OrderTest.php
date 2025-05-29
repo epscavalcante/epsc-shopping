@@ -7,7 +7,7 @@ use Src\Domain\Entities\Product;
 describe('Order Tests', function () {
     test('Deve criar um pedido com itens vazio', function () {
         $customer = new OrderCustomer(
-            accountId: uniqid('ACCOUNT_'),
+            name: 'John Doe',
             email: 'email@email.com',
             phone: '00000000000'
         );
@@ -21,7 +21,7 @@ describe('Order Tests', function () {
 
     test('Deve criar um pedido com 2 items', function () {
         $customer = new OrderCustomer(
-            accountId: uniqid('ACCOUNT_'),
+            name: 'John Doe',
             email: 'email@email.com',
             phone: '00000000000'
         );

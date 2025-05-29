@@ -17,12 +17,16 @@ describe('OrderItem Tests', function () {
         ]);
 
     test('Deve criar um item do pedido', function () {
+        $productId = uniqid('PRODUCT_', true);
         $orderITem = new OrderItem(
-            productId: uniqid('PRODUCT_', true),
+            productId: $productId,
             price: 100,
             quantity: 2
         );
 
+        expect($orderITem->productId)->toBe($productId);
+        expect($orderITem->price)->toBe(100);
+        expect($orderITem->quantity)->toBe(2);
         expect($orderITem->getTotal())->toBe(200);
     });
 });
