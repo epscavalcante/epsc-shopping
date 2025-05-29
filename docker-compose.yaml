@@ -5,4 +5,35 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/var/www
-    
+
+  mysql:
+    build:
+      context: ./.docker/mysql
+      dockerfile: Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=app
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.docker/mysql/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.2-apache
+    ports:
+      - 9000:80
+    environment:
+      - PMA_HOST=mysql
+      - MYSQL_ROOT_PASSWORD=root
+      - MEMORY_LIMIT=1024M
+      - UPLOAD_LIMIT=1024M
+      - MAX_EXECUTION_TIME=0
+      - UPLOAD_LIMI= 6096K
+    depends_on:
+      - mysql
+      
