@@ -24,6 +24,7 @@ class AsaasHttpPixPaymentGateway implements PixPaymentGateway
 
     public function process(PixPaymentGatewayInput $input): PixPaymentGatewayOutput
     {
+        $this->logger->debug('Assas Pix Input', (array) $input);
         $customerId = $this->createCustomer(
             name: $input->customerName, 
             cpfCnpj: $input->customerDocumentValue

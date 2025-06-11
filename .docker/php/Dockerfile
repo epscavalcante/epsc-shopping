@@ -25,9 +25,14 @@ RUN mkdir -p /home/$user/.composer && \
 RUN pecl install xdebug && docker-php-ext-enable xdebug && \
     echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+RUN curl https://frankenphp.dev/install.sh | sh \
+    && mv frankenphp /usr/local/bin
+
 # Set working directory
 WORKDIR /var/www
 
 USER $user
 
 CMD [ "tail", "-f", "/dev/null" ]
+
+# CMD [ "frankenphp", "php-server", "-r", "public/" ]

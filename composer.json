@@ -27,7 +27,10 @@
         "monolog/monolog": "^3.9",
         "psr/http-client": "^1.0",
         "psr/log": "^3.0",
-        "guzzlehttp/guzzle": "^7.9"
+        "guzzlehttp/guzzle": "^7.9",
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "php-di/php-di": "^7.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.8",
