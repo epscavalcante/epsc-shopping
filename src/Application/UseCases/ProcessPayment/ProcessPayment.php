@@ -6,14 +6,7 @@ namespace Src\Application\UseCases\ProcessPayment;
 
 use Src\Infraestructure\Gateways\Payment\PaymentGateway;
 
-class ProcessPayment
+abstract class ProcessPayment
 {
-    public function __construct(
-        private readonly PaymentGateway $paymentGateway
-    ) {}
-
-    public function execute(ProcessPaymentInput $input): ProcessPaymentOutput
-    {
-        return new ProcessPaymentOutput(paymentId: 'payment_id');
-    }
+    abstract public function execute(ProcessPaymentInput $input): ProcessPaymentOutput;
 }

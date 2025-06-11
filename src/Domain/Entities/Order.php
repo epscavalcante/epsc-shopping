@@ -69,4 +69,9 @@ class Order
     {
         return $this->customer->phone;
     }
+
+    public function getCustomerDocumentValue(): string
+    {
+        return '95951292085';
+    }
 }
