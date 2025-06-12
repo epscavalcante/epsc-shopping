@@ -26,7 +26,7 @@ class PlaceOrder
         );
 
         $order = new Order(
-            orderId: 'order_id',
+            orderId: uniqid('ORDER_ID_', true),
             customer: $customer
         );
 
