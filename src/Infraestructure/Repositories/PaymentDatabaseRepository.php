@@ -33,8 +33,8 @@ class PaymentDatabaseRepository implements PaymentRepository
     {
         $orderInserQuery = "
         INSERT INTO app.pagamentos 
-        (pagamento_id, pedido_id, total, valido_ate, nome_do_gateway, transacao_id_no_gateway, metodo_de_pagamento, pix_qr_code, pix_copia_e_cola) 
-        VALUES (:pagamento_id, :pedido_id, :total, :valido_ate, :nome_do_gateway, :transacao_id_no_gateway, :metodo_de_pagamento, :pix_qr_code, :pix_copia_e_cola)";
+        (pagamento_id, pedido_id, total, valido_ate, nome_do_gateway, transacao_id_no_gateway, metodo_de_pagamento, pix_qr_code, pix_copia_e_cola, codigo_de_barra_do_boleto) 
+        VALUES (:pagamento_id, :pedido_id, :total, :valido_ate, :nome_do_gateway, :transacao_id_no_gateway, :metodo_de_pagamento, :pix_qr_code, :pix_copia_e_cola, :codigo_de_barra_do_boleto)";
         $orderInsertQueryStmt = $this->databaseConnection->prepare($orderInserQuery);
         $orderInsertQueryStmt->bindValue(':pagamento_id', $payment->getId());
         $orderInsertQueryStmt->bindValue(':pedido_id', $payment->getOrderId());
@@ -43,6 +43,7 @@ class PaymentDatabaseRepository implements PaymentRepository
         $orderInsertQueryStmt->bindValue(':nome_do_gateway', $payment->getGatewayName());
         $orderInsertQueryStmt->bindValue(':transacao_id_no_gateway', $payment->getGatewayTransactionId());
         $orderInsertQueryStmt->bindValue(':metodo_de_pagamento', $payment->getPaymentMethod());
+        $orderInsertQueryStmt->bindValue(':codigo_de_barra_do_boleto', $payment->getBarCode());
         $orderInsertQueryStmt->bindValue(':pix_qr_code', $payment->getPixQrCode());
         $orderInsertQueryStmt->bindValue(':pix_copia_e_cola', $payment->getPixCopyPaste());
         $orderInsertQueryStmt->execute();
@@ -70,6 +71,7 @@ class PaymentDatabaseRepository implements PaymentRepository
             dueDate: new DateTime($getPaymentQueryResult->valido_ate),
             gatewayName: $getPaymentQueryResult->nome_do_gateway,
             gatewayTransactionId: $getPaymentQueryResult->transacao_id_no_gateway,
+            barCode: $getPaymentQueryResult->codigo_de_barra_do_boleto,
             pixQrCode: $getPaymentQueryResult->pix_qr_code,
             pixCopyPaste: $getPaymentQueryResult->pix_copia_e_cola,
         );

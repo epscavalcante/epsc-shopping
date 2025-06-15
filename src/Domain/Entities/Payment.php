@@ -11,6 +11,7 @@ class Payment
 {
     private ?string $gatewayName = null;
     private ?string $gatewayTransactionId = null;
+    private ?string $barCode = null;
     private ?string $pixQrCode = null;
     private ?string $pixCopyPaste = null;
 
@@ -22,16 +23,18 @@ class Payment
         private readonly string $paymentMethod,
         ?string $gatewayName = null,
         ?string $gatewayTransactionId = null,
+        ?string $barCode = null,
         ?string $pixQrCode = null,
         ?string $pixCopyPaste = null,
     ) {
-        $this->gatewayName = $gatewayName ?? null;
-        $this->gatewayTransactionId = $gatewayTransactionId ?? null;
-        $this->pixQrCode = $pixQrCode ?? null;
-        $this->pixCopyPaste = $pixCopyPaste ?? null;
+        $this->gatewayName = $gatewayName;
+        $this->gatewayTransactionId = $gatewayTransactionId;
+        $this->pixQrCode = $pixQrCode;
+        $this->pixCopyPaste = $pixCopyPaste;
+        $this->barCode = $barCode;
     }
 
-    public static function create(string $orderId, int $amount, DateTimeInterface $dueDate, string $paymentMethod, ?string $gatewayName = null, ?string $gatewayTransactionId = null, ?string $pixQrCode = null, ?string $pixCopyPaste = null)
+    public static function create(string $orderId, int $amount, DateTimeInterface $dueDate, string $paymentMethod, ?string $gatewayName = null, ?string $gatewayTransactionId = null, ?string $pixQrCode = null, ?string $pixCopyPaste = null, ?string $barCode = null)
     {
         $paymentId = uniqid('PAYMENT_ID_', true);
         return new self(
@@ -42,6 +45,7 @@ class Payment
             dueDate: $dueDate,
             gatewayName: $gatewayName,
             gatewayTransactionId: $gatewayTransactionId,
+            barCode: $barCode,
             pixQrCode: $pixQrCode,
             pixCopyPaste: $pixCopyPaste,
         );
@@ -56,6 +60,18 @@ class Payment
             amount: $amount,
             dueDate: $dueDate,
             paymentMethod: 'PIX',
+        );
+    }
+
+    public static function createBankSlip(string $orderId, int $amount, ?DateTimeInterface $dueDate = null)
+    {
+        $dueDate = $dueDate ?? (new DateTime())->modify('+3 day');
+
+        return self::create(
+            orderId: $orderId,
+            amount: $amount,
+            dueDate: $dueDate,
+            paymentMethod: 'BANKSLIP',
         );
     }
 
@@ -104,6 +120,17 @@ class Payment
         $this->gatewayTransactionId = $transactionId;
     }
 
+    public function getBarCode(): ?string
+    {
+        return $this->barCode;
+    }
+
+    public function setBarCode(string $value): void
+    {
+        // só deveria ser possível se o méto de pagamento for boleto
+        $this->barCode = $value;
+    }
+
     public function getPixQrCode(): ?string
     {
         return $this->pixQrCode;
@@ -111,6 +138,7 @@ class Payment
 
     public function setPixQrCode(string $value): void
     {
+        // só deveria ser possível definir o pixQrCode se o método de pagamento for PIX
         $this->pixQrCode = $value;
     }
 
