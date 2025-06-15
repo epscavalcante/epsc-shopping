@@ -8,6 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Src\Application\UseCases\PlaceOrder\PlaceOrder;
 use Src\Application\UseCases\PlaceOrder\PlaceOrderInput;
+use Src\Application\UseCases\ProcessPayment\BankSlip\BankSlipProcessPayment;
+use Src\Application\UseCases\ProcessPayment\BankSlip\BankSlipProcessPaymentInput;
 use Src\Application\UseCases\ProcessPayment\Pix\PixProcessPayment;
 use Src\Application\UseCases\ProcessPayment\Pix\PixProcessPaymentInput;
 use Src\Infraestructure\Logger\Logger;
@@ -18,6 +20,7 @@ class OrderController
         private readonly Logger $logger,
         private readonly PlaceOrder $placeOrder,
         private readonly PixProcessPayment $pixProcessPayment,
+        private readonly BankSlipProcessPayment $bankSlipProcessPayment,
     ) {}
 
     public function placeOrder(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
@@ -47,7 +50,6 @@ class OrderController
                     'order_id' => $output->orderId
                 ])
             );
-
         return $response;
     }
 
@@ -59,14 +61,33 @@ class OrderController
         $output = $this->pixProcessPayment->execute($input);
         $this->logger->debug('Output', (array) $output);
 
+        $response->withHeader('Content-Type', 'application/json')
+            ->getBody()
+            ->write(
+                json_encode([
+                    'payment_id' => $output->paymentId,
+                    'qr_code' => $output->qrCode,
+                    'qr_copy_past' => $output->copyPaste,
+                ])
+            );
+
+        return $response;
+    }
+
+    public function bankSlipProcessPayment(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $input = new BankSlipProcessPaymentInput(
+            orderId: $args['order_id'],
+        );
+        $output = $this->bankSlipProcessPayment->execute($input);
+        $this->logger->debug('Output', (array) $output);
 
         $response->withHeader('Content-Type', 'application/json')
             ->getBody()
             ->write(
                 json_encode([
                     'payment_id' => $output->paymentId,
-                    'qr_Code' => $output->qrCode,
-                    'qr_copy_past' => $output->copyPaste,
+                    'bar_Code' => $output->barCode,
                 ])
             );
 
