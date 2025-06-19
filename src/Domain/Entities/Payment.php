@@ -14,6 +14,9 @@ class Payment
     private ?string $barCode = null;
     private ?string $pixQrCode = null;
     private ?string $pixCopyPaste = null;
+    private ?string $creditCardBrand = null;
+    private ?string $creditCardLastDigits = null;
+    private ?string $creditCardToken = null;
 
     public function __construct(
         private readonly string $paymentId,
@@ -26,15 +29,21 @@ class Payment
         ?string $barCode = null,
         ?string $pixQrCode = null,
         ?string $pixCopyPaste = null,
+        ?string $creditCardBrand = null,
+        ?string $creditCardLastDigits = null,
+        ?string $creditCardToken = null,
     ) {
         $this->gatewayName = $gatewayName;
         $this->gatewayTransactionId = $gatewayTransactionId;
         $this->pixQrCode = $pixQrCode;
         $this->pixCopyPaste = $pixCopyPaste;
         $this->barCode = $barCode;
+        $this->creditCardBrand = $creditCardBrand;
+        $this->creditCardLastDigits = $creditCardLastDigits;
+        $this->creditCardToken = $creditCardToken;
     }
 
-    public static function create(string $orderId, int $amount, DateTimeInterface $dueDate, string $paymentMethod, ?string $gatewayName = null, ?string $gatewayTransactionId = null, ?string $pixQrCode = null, ?string $pixCopyPaste = null, ?string $barCode = null)
+    public static function create(string $orderId, int $amount, DateTimeInterface $dueDate, string $paymentMethod, ?string $gatewayName = null, ?string $gatewayTransactionId = null, ?string $pixQrCode = null, ?string $pixCopyPaste = null, ?string $barCode = null, ?string $creditCardToken = null, ?string $creditCardBrand = null, ?string $creditCardLastDigits = null)
     {
         $paymentId = uniqid('PAYMENT_ID_', true);
         return new self(
@@ -48,6 +57,9 @@ class Payment
             barCode: $barCode,
             pixQrCode: $pixQrCode,
             pixCopyPaste: $pixCopyPaste,
+            creditCardBrand: $creditCardBrand,
+            creditCardLastDigits: $creditCardLastDigits,
+            creditCardToken: $creditCardToken,
         );
     }
 
@@ -72,6 +84,18 @@ class Payment
             amount: $amount,
             dueDate: $dueDate,
             paymentMethod: 'BANKSLIP',
+        );
+    }
+
+    public static function createCreditCard(string $orderId, int $amount, ?DateTimeInterface $dueDate = null)
+    {
+        $dueDate = $dueDate ?? (new DateTime())->modify('+3 day');
+
+        return self::create(
+            orderId: $orderId,
+            amount: $amount,
+            dueDate: $dueDate,
+            paymentMethod: 'CREDIT_CARD',
         );
     }
 
@@ -155,5 +179,43 @@ class Payment
     public function isPixPaymentMethod(): bool
     {
         return $this->paymentMethod === 'PIX';
+    }
+
+    public function isCreditCardMethod(): bool
+    {
+        return $this->paymentMethod === 'CREDIT_CARD';
+    }
+
+    public function getCreditCardToken(): ?string
+    {
+        return $this->creditCardToken;
+    }
+
+    public function setCreditCardToken(string $value): void
+    {
+        // só deveria ser possível definir o creditCardToken se o método de pagamento for CREDIT_CARD
+        $this->creditCardToken = $value;
+    }
+
+    public function getCreditCardBrand(): ?string
+    {
+        return $this->creditCardBrand;
+    }
+
+    public function setCreditCardBrand(string $value): void
+    {
+        // só deveria ser possível definir o creditCardBrand se o método de pagamento for CREDIT_CARD
+        $this->creditCardBrand = $value;
+    }
+
+    public function getCreditCardLastDigits(): ?string
+    {
+        return $this->creditCardLastDigits;
+    }
+
+    public function setCreditCardLastDigits(string $value): void
+    {
+        // só deveria ser possível definir o creditCardLastDigits se o método de pagamento for CREDIT_CARD
+        $this->creditCardLastDigits = $value;
     }
 }

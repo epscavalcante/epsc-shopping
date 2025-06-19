@@ -6,15 +6,18 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Src\Application\Gateways\Payment\BankSlip\BankSlipPaymentGateway;
+use Src\Application\Gateways\Payment\CreditCard\CreditCardPaymentGateway;
 use Src\Application\Gateways\Payment\Pix\PixPaymentGateway;
 use Src\Application\UseCases\PlaceOrder\PlaceOrder;
 use Src\Application\UseCases\ProcessPayment\BankSlip\BankSlipProcessPayment;
+use Src\Application\UseCases\ProcessPayment\CreditCard\CreditCardProcessPayment;
 use Src\Application\UseCases\ProcessPayment\Pix\PixProcessPayment;
 use Src\Domain\Repositories\OrderRepository;
 use Src\Domain\Repositories\PaymentRepository;
 use Src\Domain\Repositories\ProductRepository;
 use Src\Infraestructure\Gateways\Payment\AbacatePay\AbacatePayHttpPixPaymentGateway;
 use Src\Infraestructure\Gateways\Payment\Asaas\AsaasHttpBankSlipPaymentGateway;
+use Src\Infraestructure\Gateways\Payment\Asaas\AsaasHttpCreditCardPaymentGateway;
 use Src\Infraestructure\Gateways\Payment\Asaas\AsaasHttpPixPaymentGateway;
 use Src\Infraestructure\Http\Client\GuzzleHttpClientAdapter;
 use Src\Infraestructure\Http\Client\HttpClient;
@@ -61,6 +64,14 @@ $container->set(BankSlipPaymentGateway::class, function (ContainerInterface $con
     );
 });
 
+$container->set(CreditCardPaymentGateway::class, function (ContainerInterface $container) {
+    // poderia decidir qual implementação utilizar através do env
+    return new AsaasHttpCreditCardPaymentGateway(
+        logger: $container->get(Logger::class),
+        httpClient: $container->get(HttpClient::class),
+    );
+});
+
 $container->set(PixProcessPayment::class, function (ContainerInterface $container) {
     return new PixProcessPayment(
         pixPaymentGateway: $container->get(PixPaymentGateway::class),
@@ -77,12 +88,21 @@ $container->set(BankSlipProcessPayment::class, function (ContainerInterface $con
     );
 });
 
+$container->set(CreditCardProcessPayment::class, function (ContainerInterface $container) {
+    return new CreditCardProcessPayment(
+        creditCardPaymentGateway: $container->get(CreditCardPaymentGateway::class),
+        orderRepository: $container->get(OrderRepository::class),
+        paymentRepository: $container->get(PaymentRepository::class),
+    );
+});
+
 $container->set(OrderController::class, function (ContainerInterface $container) {
     return new OrderController(
         logger: $container->get(Logger::class),
         placeOrder: $container->get(PlaceOrder::class),
         pixProcessPayment: $container->get(PixProcessPayment::class),
-        bankSlipProcessPayment: $container->get(BankSlipProcessPayment::class)
+        bankSlipProcessPayment: $container->get(BankSlipProcessPayment::class),
+        creditCardProcessPayment: $container->get(CreditCardProcessPayment::class),
     );
 });
 
@@ -107,5 +127,6 @@ $app->get('/', function (Request $request, Response $response, $args) {
 $app->post('/orders', [OrderController::class, 'placeOrder']);
 $app->post('/orders/{order_id}/pix-process-payment', [OrderController::class, 'pixProcessPayment']);
 $app->post('/orders/{order_id}/bankslip-process-payment', [OrderController::class, 'bankSlipProcessPayment']);
+$app->post('/orders/{order_id}/credit-card-process-payment', [OrderController::class, 'creditCardProcessPayment']);
 
 $app->run();

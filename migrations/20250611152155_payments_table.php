@@ -22,6 +22,9 @@ final class PaymentsTable extends AbstractMigration
             ->addColumn('codigo_de_barra_do_boleto', 'string', ['null' => true])
             ->addColumn('pix_qr_code', 'text', ['null' => true])
             ->addColumn('pix_copia_e_cola', 'text', ['null' => true])
+            ->addColumn('cartao_bandeira', 'string', ['null' => true])
+            ->addColumn('cartao_token', 'string', ['null' => true])
+            ->addColumn('cartao_ultimos_digitos', 'string', ['null' => true])
             ->addTimestamps()
             ->create();
     }

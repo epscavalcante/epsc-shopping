@@ -33,8 +33,8 @@ class PaymentDatabaseRepository implements PaymentRepository
     {
         $orderInserQuery = "
         INSERT INTO app.pagamentos 
-        (pagamento_id, pedido_id, total, valido_ate, nome_do_gateway, transacao_id_no_gateway, metodo_de_pagamento, pix_qr_code, pix_copia_e_cola, codigo_de_barra_do_boleto) 
-        VALUES (:pagamento_id, :pedido_id, :total, :valido_ate, :nome_do_gateway, :transacao_id_no_gateway, :metodo_de_pagamento, :pix_qr_code, :pix_copia_e_cola, :codigo_de_barra_do_boleto)";
+        (pagamento_id, pedido_id, total, valido_ate, nome_do_gateway, transacao_id_no_gateway, metodo_de_pagamento, pix_qr_code, pix_copia_e_cola, codigo_de_barra_do_boleto, cartao_bandeira, cartao_token, cartao_ultimos_digitos) 
+        VALUES (:pagamento_id, :pedido_id, :total, :valido_ate, :nome_do_gateway, :transacao_id_no_gateway, :metodo_de_pagamento, :pix_qr_code, :pix_copia_e_cola, :codigo_de_barra_do_boleto, :cartao_bandeira, :cartao_token, :cartao_ultimos_digitos)";
         $orderInsertQueryStmt = $this->databaseConnection->prepare($orderInserQuery);
         $orderInsertQueryStmt->bindValue(':pagamento_id', $payment->getId());
         $orderInsertQueryStmt->bindValue(':pedido_id', $payment->getOrderId());
@@ -46,6 +46,9 @@ class PaymentDatabaseRepository implements PaymentRepository
         $orderInsertQueryStmt->bindValue(':codigo_de_barra_do_boleto', $payment->getBarCode());
         $orderInsertQueryStmt->bindValue(':pix_qr_code', $payment->getPixQrCode());
         $orderInsertQueryStmt->bindValue(':pix_copia_e_cola', $payment->getPixCopyPaste());
+        $orderInsertQueryStmt->bindValue(':cartao_bandeira', $payment->getCreditCardBrand());
+        $orderInsertQueryStmt->bindValue(':cartao_token', $payment->getCreditCardToken());
+        $orderInsertQueryStmt->bindValue(':cartao_ultimos_digitos', $payment->getCreditCardLastDigits());
         $orderInsertQueryStmt->execute();
     }
 
@@ -74,6 +77,9 @@ class PaymentDatabaseRepository implements PaymentRepository
             barCode: $getPaymentQueryResult->codigo_de_barra_do_boleto,
             pixQrCode: $getPaymentQueryResult->pix_qr_code,
             pixCopyPaste: $getPaymentQueryResult->pix_copia_e_cola,
+            creditCardToken: $getPaymentQueryResult->cartao_token,
+            creditCardBrand: $getPaymentQueryResult->cartao_bandeira,
+            creditCardLastDigits: $getPaymentQueryResult->cartao_ultimos_digitos,
         );
 
         return $payment;

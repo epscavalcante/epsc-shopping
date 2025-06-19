@@ -10,6 +10,8 @@ use Src\Application\UseCases\PlaceOrder\PlaceOrder;
 use Src\Application\UseCases\PlaceOrder\PlaceOrderInput;
 use Src\Application\UseCases\ProcessPayment\BankSlip\BankSlipProcessPayment;
 use Src\Application\UseCases\ProcessPayment\BankSlip\BankSlipProcessPaymentInput;
+use Src\Application\UseCases\ProcessPayment\CreditCard\CreditCardProcessPayment;
+use Src\Application\UseCases\ProcessPayment\CreditCard\CreditCardProcessPaymentInput;
 use Src\Application\UseCases\ProcessPayment\Pix\PixProcessPayment;
 use Src\Application\UseCases\ProcessPayment\Pix\PixProcessPaymentInput;
 use Src\Infraestructure\Logger\Logger;
@@ -21,6 +23,7 @@ class OrderController
         private readonly PlaceOrder $placeOrder,
         private readonly PixProcessPayment $pixProcessPayment,
         private readonly BankSlipProcessPayment $bankSlipProcessPayment,
+        private readonly CreditCardProcessPayment $creditCardProcessPayment,
     ) {}
 
     public function placeOrder(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
@@ -88,6 +91,39 @@ class OrderController
                 json_encode([
                     'payment_id' => $output->paymentId,
                     'bar_Code' => $output->barCode,
+                ])
+            );
+
+        return $response;
+    }
+
+    public function creditCardProcessPayment(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $data = $request->getParsedBody();
+        $input = new CreditCardProcessPaymentInput(
+            orderId: $args['order_id'],
+            cardHolderName: $data['card_holder_name'] ?? null,
+            cardNumber: $data['card_number'] ?? null,
+            cardExpiryMonth: $data['card_expiry_month'] ?? null,
+            cardExpiryYear: $data['card_expiry_year'] ?? null,
+            cardCCV: $data['card_ccv'] ?? null,
+            holderName: $data['holder_name'] ?? null,
+            holderEmail: $data['holder_email'] ?? null,
+            holderDocumentValue: $data['holder_document_value'] ?? null,
+            holderAddressPostalCode: $data['holder_address_postal_code'] ?? null,
+            holderAddressNumber: $data['holder_address_number'] ?? null,
+            holderAddressComplement: $data['holder_address_complement'] ?? null,
+            holderPhone: $data['holder_phone'] ?? null,
+        );
+        $output = $this->creditCardProcessPayment->execute($input);
+        $this->logger->debug('Output', (array) $output);
+
+        $response->withHeader('Content-Type', 'application/json')
+            ->getBody()
+            ->write(
+                json_encode([
+                    'payment_id' => $output->paymentId,
+
                 ])
             );
 
