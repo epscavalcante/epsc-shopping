@@ -7,4 +7,6 @@ use Src\Domain\Entities\Product;
 interface ProductRepository
 {
     public function getById(string $id): ?Product;
+
+    public function getByIdOrFail(string $id): Product;
 }
