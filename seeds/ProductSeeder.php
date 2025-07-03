@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Phinx\Seed\AbstractSeed;
-use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\Uuid;
 
 class ProductSeeder extends AbstractSeed
